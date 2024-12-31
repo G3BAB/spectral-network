@@ -1,6 +1,9 @@
 # Spectral Classification with TensorFlow
 
-This project is designed for the classification of mineral spectra using a Convolutional Neural Network (CNN). It includes tools for processing spectral data, training the CNN model, and evaluating its performance with graphical outputs and a confusion matrix.
+This project is designed for the classification of mineral spectra using a Convolutional Neural Network. It includes tools for processing spectral data, training the CNN model, and evaluating its performance with graphical outputs and a confusion matrix. Example data for training and testing is bundled with the repository, but can be replaced with other data.
+
+## Future development
+As of now, the code trains and evaluates the accuracy of the network. However, a functionality that allows the user to then upload independent data for classification has not yet been implemented. It will be the focus of development in the near future.
 
 ## Features
 
