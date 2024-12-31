@@ -7,9 +7,10 @@ As of now, the code trains and evaluates the accuracy of the network. However, a
 
 ## Features
 
-- **Data Processing:** Handles normalization, dimensionality reduction, and noise addition.
+- **Data Processing:** Handles data formatting, dimensionality reduction, and smoothing.
 - **Customizable Training:** Configuration options for training epochs, learning rates, and dataset ratios via a config file.
-- **Evaluation Graphics:** Generates accuracy plots and confusion matrices to assess model performance.
+- **Evaluation mode:** Generates accuracy plots and confusion matrices to assess model performance.
+- **Model export:** Model can be exported for later use.
 
 ## Acknowledgments
 
