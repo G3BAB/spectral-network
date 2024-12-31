@@ -10,7 +10,7 @@ This project is designed for the classification of mineral spectra using a Convo
 
 ## Acknowledgments
 
-The files included in the default training set are based on the RRUFF database, with modifications such as normalization and noise addition. If using this dataset or derivatives in your work, please cite:
+The files included in the default training set are based on the RRUFF database, with modifications such as normalization and noise addition.
 
 Lafuente B, Downs R T, Yang H, Stone N (2015)  
 *The power of databases: the RRUFF project.*  
