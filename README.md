@@ -5,6 +5,8 @@ This project is designed for the classification of mineral spectra using a Convo
 ## Future development
 As of now, the code trains and evaluates the accuracy of the network. However, a functionality that allows the user to then upload independent data for classification has not yet been implemented. It will be the focus of development in the near future.
 
+Moreover, future work will focus on ensuring more modular and manageable code for better customizability for various data.
+
 ## Features
 
 - **Data Processing:** Handles data formatting, dimensionality reduction, and smoothing.
