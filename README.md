@@ -16,7 +16,7 @@ Moreover, future work will focus on ensuring more modular and manageable code fo
 
 ## Acknowledgments
 
-The files included in the default training set are based on the RRUFF database, with modifications such as normalization and noise addition. The author of the repository is not affiliated with RRUFF project.
+For experimenting and testing the neural networks, RRUFF database of mineral spectra is recommended. The author of the repository is not affiliated with RRUFF project.
 
 More information about RRUFF:
 
