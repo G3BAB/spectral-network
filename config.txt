@@ -1,4 +1,4 @@
-epochs=600
+epochs=300
 initial_learning_rate=0.0115
 learning_rate_scaling=0.975
 scaling_frequency=10
@@ -8,7 +8,9 @@ test_ratio=0.22
 val_ratio=0.15
 root_folder=./data/TRAIN
 model_save_path=model.keras
-reduce_dimensionality=True
+reduce_dimensions=True
 gaussian_smoothing=True
 wavelength_range=(0, 1500)
 evaluation_graphics=True
+randomizer_seed=17
+reduce_dimensions=True

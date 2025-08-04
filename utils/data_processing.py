@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import pandas as pd
+import tensorflow as tf
 from scipy.signal import savgol_filter
 from sklearn.preprocessing import LabelEncoder
 
@@ -9,7 +10,7 @@ from sklearn.preprocessing import LabelEncoder
 # --------------------------------------------------------------
 def process_spectral_data(
     root_folder,
-    reduce_dimensionality=True,
+    reduce_dimensions=True,
     gaussian_smoothing=True,
     wavelength_range=(0, 1500)
 ):
@@ -17,7 +18,7 @@ def process_spectral_data(
     Processes spectral data from the given folder.
     Args:
         root_folder (str): Path to the root folder containing class subdirectories.
-        reduce_dimensionality (bool): Whether to reduce dimensionality by 50% by averaging adjacent points.
+        reduce_dimensions (bool): Whether to reduce dimensions by 50% by averaging adjacent points.
         gaussian_smoothing (bool): Whether to apply Gaussian smoothing to intensity data.
         wavelength_range (tuple): Range of wavelengths to consider (start, end).
 
@@ -26,7 +27,7 @@ def process_spectral_data(
         np.array(all_labels): Array of integer labels corresponding to each sample.
     """
     import warnings
-    warnings.filterwarnings("ignore", category=RuntimeWarning)  # Suppress Savitzky-Golay filter warnings
+    warnings.filterwarnings("ignore", category=RuntimeWarning)
 
     # Find class folders in the root directory
     class_folders = [
@@ -82,7 +83,7 @@ def process_spectral_data(
                 )
 
                 # Reduce dimensionality if enabled
-                if reduce_dimensionality:
+                if reduce_dimensions:
                     reduced_intensities = interpolated_intensities.reshape(-1, 2).mean(axis=1)
                 else:
                     reduced_intensities = interpolated_intensities
@@ -98,3 +99,28 @@ def process_spectral_data(
     all_labels = label_encoder.fit_transform(all_labels)
 
     return np.array(all_data), np.array(all_labels)
+
+
+def prepare_dataset(all_data, all_labels, feature_dim, config):
+    from sklearn.model_selection import train_test_split
+    X_train, X_temp, y_train, y_temp = train_test_split(
+        all_data, all_labels,
+        test_size=config["test_ratio"] + config["val_ratio"],
+        stratify=all_labels
+    )
+    X_val, X_test, y_val, y_test = train_test_split(
+        X_temp, y_temp,
+        test_size=config["test_ratio"] / (config["test_ratio"] + config["val_ratio"]),
+        stratify=y_temp
+    )
+
+    X_train = X_train.reshape(-1, 1, feature_dim, 1)
+    X_val = X_val.reshape(-1, 1, feature_dim, 1)
+    X_test = X_test.reshape(-1, 1, feature_dim, 1)
+
+    num_classes = len(np.unique(all_labels))
+    y_train = tf.keras.utils.to_categorical(y_train, num_classes)
+    y_val = tf.keras.utils.to_categorical(y_val, num_classes)
+    y_test = tf.keras.utils.to_categorical(y_test, num_classes)
+
+    return X_train, X_val, X_test, y_train, y_val, y_test, num_classes
