@@ -1,6 +1,6 @@
-matplotlib==3.6.3
-numpy==2.2.1
-pandas==2.1.4+dfsg
-scikit_learn==1.6.0
-scipy==1.14.1
-tensorflow==2.18.0
+matplotlib==3.10.5
+numpy==2.3.2
+pandas==2.3.1
+scikit_learn==1.7.1
+scipy==1.16.1
+tensorflow==2.19.0
