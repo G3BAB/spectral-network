@@ -5,9 +5,7 @@ import tensorflow as tf
 from scipy.signal import savgol_filter
 from sklearn.preprocessing import LabelEncoder
 
-# --------------------------------------------------------------
 # Data Pre-Processing
-# --------------------------------------------------------------
 def process_spectral_data(
     root_folder,
     reduce_dimensions=True,

@@ -1,9 +1,10 @@
 import os
 import random
-import logging
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
+
+from utils.logger import log_training, log_info, log_info_console, log_warning, log_error
 
 
 class PrintLogs(tf.keras.callbacks.Callback):
@@ -14,19 +15,19 @@ class PrintLogs(tf.keras.callbacks.Callback):
 
     def on_train_begin(self, logs=None):
         train_size, val_size, test_size, all_size = self.dataset_shapes
-        logging.info(f"Total samples: {all_size}")
-        logging.info(f"Training samples: {train_size}")
-        logging.info(f"Test samples: {test_size}")
-        logging.info(f"Validation samples: {val_size}")
-        logging.info("Starting training...\n")
+        log_info(f"Total samples: {all_size}")
+        log_info(f"Training samples: {train_size}")
+        log_info(f"Test samples: {test_size}")
+        log_info(f"Validation samples: {val_size}")
+        log_info("Starting training...\n")
 
     def on_epoch_end(self, epoch, logs=None):
         metrics = [f"{key}: {value:.4f}" for key, value in logs.items()]
         metrics_str = f"Epoch {epoch + 1}/{self.total_epochs} - " + " - ".join(metrics)
-        logging.info(metrics_str)
+        log_info(metrics_str)
 
     def on_train_end(self, logs=None):
-        logging.info("Training finished.")
+        log_info_console("Training finished.")
 
 
 class SpectralTrainer:
@@ -76,7 +77,7 @@ class SpectralTrainer:
 
     def evaluate(self, X_test, y_test):
         test_loss, test_accuracy = self.model.evaluate(X_test, y_test, verbose=0)
-        logging.info(f"Test Accuracy: {test_accuracy * 100:.2f}%")
+        log_info(f"Test Accuracy: {test_accuracy * 100:.2f}%")
         return test_accuracy
 
     def plot_results(self, history, X_test, y_test):
@@ -84,7 +85,7 @@ class SpectralTrainer:
         y_true = np.argmax(y_test, axis=1)
 
         confusion_mtx = tf.math.confusion_matrix(y_true, y_pred).numpy()
-        logging.info("Confusion Matrix:\n%s", confusion_mtx)
+        log_info_console("Confusion Matrix:\n%s", confusion_mtx)
 
         plt.plot(history.history['accuracy'], label='Training Accuracy')
         plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
@@ -100,9 +101,9 @@ class SpectralTrainer:
         if save_model in ["yes", "y"]:
             save_path = self.config.get("model_save_path", "saved_model")
             self.model.save(save_path)
-            logging.info(f"Model saved to: {save_path}")
+            log_info(f"Model saved to: {save_path}")
         else:
-            logging.info("Model was not saved.")
+            log_info("Model was not saved.")
 
     def finalize(self, history, X_test, y_test):
         self.evaluate(X_test, y_test)

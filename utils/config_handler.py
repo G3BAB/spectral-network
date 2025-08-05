@@ -1,6 +1,6 @@
 import os
 import sys
-import logging
+from utils.logger import log_info, log_warning, log_error, log_info_console
 
 CONFIG_FILE = "config.txt"
 DEFAULT_CONFIG = {
@@ -21,20 +21,12 @@ DEFAULT_CONFIG = {
     "randomizer_seed": 17
 }
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.StreamHandler()
-    ]
-)
-
 
 def load_config(config_file=CONFIG_FILE):
     """Loads configuration parameters from a file, with validation and user intervention for missing values."""
 
     if not os.path.exists(config_file):
-        logging.warning(f"{config_file} not found. Regenerating with default values.")
+        log_warning(f"{config_file} not found. Regenerating with default values.")
         regenerate_config(config_file, DEFAULT_CONFIG)
 
     config = {}
@@ -59,7 +51,7 @@ def load_config(config_file=CONFIG_FILE):
             missing_keys.append(key)
 
     if missing_keys:
-        logging.warning(f"\nMissing configuration keys: {', '.join(missing_keys)}")
+        log_warning(f"\nMissing configuration keys: {', '.join(missing_keys)}")
         response = input("\nChoose an action:\n[1] Terminate script [2] Use default values and proceed: ")
         if response == "1":
             sys.exit("Terminating due to missing config values. Modify the config file and try again.")
@@ -68,7 +60,7 @@ def load_config(config_file=CONFIG_FILE):
                 config[key] = DEFAULT_CONFIG[key]
 
             save_config(config, config_file)
-            logging.info("Loaded default values")
+            log_info_console("Loaded default values")
 
         else:
             sys.exit("Invalid input. Terminating script.")
@@ -83,7 +75,7 @@ def regenerate_config(config_file=CONFIG_FILE, defaults=DEFAULT_CONFIG):
     with open(config_file, "w") as file:
         for key, value in defaults.items():
             file.write(f"{key}={value}\n")
-    logging.info(f"{config_file} has been reset to default values.")
+    log_info_console(f"{config_file} has been reset to default values.")
 
 
 def save_config(config, config_file=CONFIG_FILE):
@@ -91,7 +83,7 @@ def save_config(config, config_file=CONFIG_FILE):
     with open(config_file, "w") as file:
         for key, value in config.items():
             file.write(f"{key}={value}\n")
-    logging.info(f"Configuration saved to {config_file}.")
+    log_info_console(f"Configuration saved to {config_file}.")
 
 
 def check_ratios(config):
@@ -103,4 +95,4 @@ def check_ratios(config):
     if train_ratio <= 0:
         sys.exit("Error: Invalid configuration. Train ratio is non-positive.")
     if train_ratio < 0.5:
-        logging.warning(f"Train ratio is below 0.5!!! (currently {train_ratio:.2f}).")
+        log_warning(f"Train ratio is below 0.5!!! (currently {train_ratio:.2f}).")
