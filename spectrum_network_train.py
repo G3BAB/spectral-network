@@ -4,10 +4,14 @@ from utils.model_subclasses import SpectralCNN
 from utils.training_pipeline import SpectralTrainer, set_seed
 from utils.logger import log_training, log_info, log_info_console
 
+# TODO:
+# - separate log file for each run, stored in subdirectories with corresponding date
+# - save model option in config instead of at runtime
 
 def main():
     config = load_config()
-    set_seed(config["randomizer_seed"])
+    training_seed = config["randomizer_seed"]
+    set_seed(training_seed)
 
     log_info_console("Loading and preprocessing data...")
     all_data, all_labels = process_spectral_data(
@@ -30,6 +34,7 @@ def main():
     trainer.compile_model()
 
     log_training("Starting training...")
+    log_training(f"Randomizer seed: {training_seed}")
     history = trainer.train(
         X_train, y_train, X_val, y_val,
         all_data_shape=all_data.shape,

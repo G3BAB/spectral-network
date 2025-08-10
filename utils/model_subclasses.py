@@ -5,7 +5,7 @@ class ConvBlock(tf.keras.layers.Layer):
     def __init__(self, filters, kernel_size=(1, 8), pool_size=(1, 2)):
         super().__init__()
         self.conv = tf.keras.layers.Conv2D(filters, kernel_size, padding='same')
-        self.activation = tf.keras.layers.LeakyReLU(alpha=0.01)
+        self.activation = tf.keras.layers.LeakyReLU(negative_slope=0.01)
         self.pool = tf.keras.layers.MaxPooling2D(pool_size=pool_size, strides=pool_size)
 
     def call(self, x):
@@ -21,7 +21,7 @@ class SpectralCNN(tf.keras.Model):
         self.block2 = ConvBlock(64)
         self.flatten = tf.keras.layers.Flatten()
         self.dense = tf.keras.layers.Dense(128)
-        self.activation = tf.keras.layers.LeakyReLU(alpha=0.01)
+        self.activation = tf.keras.layers.LeakyReLU(negative_slope=0.01)
         self.dropout = tf.keras.layers.Dropout(0.5)
         self.output_layer = tf.keras.layers.Dense(num_classes, activation='softmax')
 

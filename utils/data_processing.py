@@ -67,9 +67,10 @@ def process_spectral_data(
                 except ValueError as e:
                     print(f"Skipping file {file_name}: Unable to convert to numeric. Error: {e}")
                     continue
-
-                wavelengths = file_data[:, 0]
-                intensities = file_data[:, 1]
+                
+                # EXPERIMENTAL - astype
+                wavelengths = file_data[:, 0].astype("int")
+                intensities = file_data[:, 1].astype("float32")
 
                 # Apply Gaussian smoothing if enabled
                 if gaussian_smoothing:

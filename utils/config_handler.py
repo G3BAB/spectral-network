@@ -4,7 +4,7 @@ from utils.logger import log_info, log_warning, log_error, log_info_console
 
 CONFIG_FILE = "config.txt"
 DEFAULT_CONFIG = {
-    "epochs": 100,
+    "epochs": 75,
     "initial_learning_rate": 0.0115,
     "learning_rate_scaling": 0.975,
     "scaling_frequency": 10,

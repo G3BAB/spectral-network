@@ -1,4 +1,4 @@
-epochs=300
+epochs=50
 initial_learning_rate=0.0115
 learning_rate_scaling=0.975
 scaling_frequency=10
