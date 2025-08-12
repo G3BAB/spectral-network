@@ -1,6 +1,7 @@
 import os
 import sys
-from utils.logger import log_info, log_warning, log_error, log_info_console
+from utils.logger import log_info_console, log_warning
+
 
 CONFIG_FILE = "config.txt"
 DEFAULT_CONFIG = {
@@ -21,78 +22,105 @@ DEFAULT_CONFIG = {
     "randomizer_seed": 17
 }
 
+class Config:
+    """
+    Represents the application configuration.
 
-def load_config(config_file=CONFIG_FILE):
-    """Loads configuration parameters from a file, with validation and user intervention for missing values."""
+    Loads from a file, stores config values as attributes, validates them,
+    and can save back to disk. Missing keys are filled with DEFAULT_CONFIG.
+    """
 
-    if not os.path.exists(config_file):
-        log_warning(f"{config_file} not found. Regenerating with default values.")
-        regenerate_config(config_file, DEFAULT_CONFIG)
+    def __init__(self, **kwargs):
+        # Populate attributes from kwargs or fall back to defaults
+        for key, default in DEFAULT_CONFIG.items():
+            setattr(self, key, kwargs.get(key, default))
 
-    config = {}
-    missing_keys = []
+        self._validate()
 
-    with open(config_file, "r") as file:
-        for line in file:
-            key, value = line.strip().split("=")
+    @classmethod
+    def from_file(cls, path=CONFIG_FILE):
+        """
+        Create a Config instance from a config file.
+        If file is missing, regenerate with defaults.
+        """
+        if not os.path.exists(path):
+            log_warning(f"{path} not found. Regenerating with default values.")
+            cls._regenerate_file(path)
+            return cls(**DEFAULT_CONFIG)
+
+        loaded = {}
+        
+        # Read and parse each line of the config file
+        with open(path, "r") as f:
+            for line in f:
+                key, value = line.strip().split("=")
+                loaded[key] = cls._parse_value(key, value)
+
+        # Fill in any missing keys with defaults
+        for key, default in DEFAULT_CONFIG.items():
+            if key not in loaded:
+                log_warning(f"Missing '{key}' in config, using default value.")
+                loaded[key] = default
+
+        config = cls(**loaded)
+        config.save(path)
+        return config
+
+    @staticmethod
+    def _parse_value(key, value):
+        """
+        Convert string values from the config file into correct Python types.
+        Handles bools, tuples, floats, and ints.
+        """
+
+        # Boolean parsing
+        if value.lower() in ["true", "false"]:
+            return value.lower() == "true"
+        
+        # Special case for wavelength_range tuple
+        if key == "wavelength_range" and "," in value:
+            return tuple(map(int, value.strip("()").split(",")))
+        
+        if "." in value:
             try:
-                if value.lower() in ["true", "false"]:
-                    config[key] = value.lower() == "true"
-                elif "," in value and key == "wavelength_range":
-                    config[key] = tuple(map(int, value.strip("()").split(",")))
-                else:
-                    config[key] = float(value) if "." in value else int(value)
+                return float(value)
             except ValueError:
-                config[key] = value
+                pass
+        
+        try:
+            return int(value)
+        except ValueError:
+            return value
 
-    # Check for missing keys
-    for key in DEFAULT_CONFIG.keys():
-        if key not in config:
-            missing_keys.append(key)
+    def save(self, path=CONFIG_FILE):
+        """
+        Write the current config values back to a file.
+        """
+        with open(path, "w") as f:
+            for key in DEFAULT_CONFIG:
+                f.write(f"{key}={getattr(self, key)}\n")
+        log_info_console(f"Configuration saved to {path}.")
 
-    if missing_keys:
-        log_warning(f"\nMissing configuration keys: {', '.join(missing_keys)}")
-        response = input("\nChoose an action:\n[1] Terminate script [2] Use default values and proceed: ")
-        if response == "1":
-            sys.exit("Terminating due to missing config values. Modify the config file and try again.")
-        elif response == "2":
-            for key in missing_keys:
-                config[key] = DEFAULT_CONFIG[key]
+    @staticmethod
+    def _regenerate_file(path):
+        """
+        Write a fresh config file containing DEFAULT_CONFIG values.
+        """
+        with open(path, "w") as f:
+            for key, val in DEFAULT_CONFIG.items():
+                f.write(f"{key}={val}\n")
+        log_info_console(f"{path} regenerated with default values.")
 
-            save_config(config, config_file)
-            log_info_console("Loaded default values")
+    def _validate(self):
+        """
+        Run sanity checks on configuration values.
+        Exits the program if critical values are invalid.
+        """
+        train_ratio = 1 - (self.test_ratio + self.val_ratio)
 
-        else:
-            sys.exit("Invalid input. Terminating script.")
-
-    check_ratios(config)
-    return config
-
-
-def regenerate_config(config_file=CONFIG_FILE, defaults=DEFAULT_CONFIG):
-    """Restores the config file with default values determined at the start of this module."""
-
-    with open(config_file, "w") as file:
-        for key, value in defaults.items():
-            file.write(f"{key}={value}\n")
-    log_info_console(f"{config_file} has been reset to default values.")
-
-
-def save_config(config, config_file=CONFIG_FILE):
-    """Saves the configuration to a file."""
-    with open(config_file, "w") as file:
-        for key, value in config.items():
-            file.write(f"{key}={value}\n")
-    log_info_console(f"Configuration saved to {config_file}.")
-
-
-def check_ratios(config):
-    """Validates that dataset split ratios make sense."""
-
-    train_ratio = 1 - (config["test_ratio"] + config["val_ratio"])
-    if config["test_ratio"] < 0 or config["val_ratio"] < 0:
-        sys.exit("Error: Test and validation ratios cannot be negative.")
-    if train_ratio <= 0:
-        sys.exit("Error: Invalid configuration. Train ratio is non-positive.")
-    if train_ratio < 0.5:
-        log_warning(f"Train ratio is below 0.5!!! (currently {train_ratio:.2f}).")
+        if self.test_ratio < 0 or self.val_ratio < 0:
+            sys.exit("Error: Test and validation ratios cannot be negative.")
+        if train_ratio <= 0:
+            sys.exit("Error: Invalid configuration. Train ratio is non-positive.")
+        if train_ratio < 0.5:
+            log_warning(f"Train ratio is below 0.5!!! (currently {train_ratio:.2f}).")

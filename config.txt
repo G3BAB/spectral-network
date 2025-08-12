@@ -13,4 +13,3 @@ gaussian_smoothing=True
 wavelength_range=(0, 1500)
 evaluation_graphics=True
 randomizer_seed=17
-reduce_dimensions=True

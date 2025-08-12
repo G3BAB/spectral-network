@@ -2,3 +2,4 @@ __pycache__/
 *.keras
 data
 training.log
+model.keras

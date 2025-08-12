@@ -37,7 +37,7 @@ class SpectralTrainer:
 
     def compile_model(self):
         self.model.compile(
-            optimizer=tf.keras.optimizers.Adam(learning_rate=self.config["initial_learning_rate"]),
+            optimizer=tf.keras.optimizers.Adam(learning_rate=self.config.initial_learning_rate),
             loss='categorical_crossentropy',
             metrics=['accuracy']
         )
@@ -45,18 +45,18 @@ class SpectralTrainer:
     def train(self, X_train, y_train, X_val, y_val, all_data_shape, X_test_shape):
         early_stopping = tf.keras.callbacks.EarlyStopping(
             monitor='val_loss',
-            patience=self.config["validation_patience"],
+            patience=self.config.validation_patience,
             restore_best_weights=True
         )
 
         lr_scheduler = tf.keras.callbacks.LearningRateScheduler(
-            lambda epoch: self.config["initial_learning_rate"] * (
-                self.config["learning_rate_scaling"] ** (epoch // self.config["scaling_frequency"])
+            lambda epoch: self.config.initial_learning_rate * (
+                self.config.learning_rate_scaling ** (epoch // self.config.scaling_frequency)
             )
         )
 
         print_logs = PrintLogs(
-            total_epochs=self.config["epochs"],
+            total_epochs=self.config.epochs,
             dataset_shapes=(
                 X_train.shape[0],
                 X_val.shape[0],
@@ -68,8 +68,8 @@ class SpectralTrainer:
         history = self.model.fit(
             X_train, y_train,
             validation_data=(X_val, y_val),
-            epochs=self.config["epochs"],
-            batch_size=self.config["batch_size"],
+            epochs=self.config.epochs,
+            batch_size=self.config.batch_size,
             callbacks=[early_stopping, lr_scheduler, print_logs],
             verbose=0
         )
@@ -99,7 +99,7 @@ class SpectralTrainer:
     def maybe_save(self):
         save_model = input("\nWould you like to save the trained model? (y/n): ").strip().lower()
         if save_model in ["yes", "y"]:
-            save_path = self.config.get("model_save_path", "saved_model")
+            save_path = self.config.model_save_path
             self.model.save(save_path)
             log_info(f"Model saved to: {save_path}")
         else:
@@ -107,7 +107,8 @@ class SpectralTrainer:
 
     def finalize(self, history, X_test, y_test):
         self.evaluate(X_test, y_test)
-        if self.config.get("evaluation_graphics", False):
+        print(self.config.evaluation_graphics)
+        if self.config.evaluation_graphics==True:
             self.plot_results(history, X_test, y_test)
         self.maybe_save()
 

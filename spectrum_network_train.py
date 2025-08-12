@@ -1,4 +1,4 @@
-from utils.config_handler import load_config
+from utils.config_handler import Config
 from utils.data_processing import process_spectral_data, prepare_dataset
 from utils.model_subclasses import SpectralCNN
 from utils.training_pipeline import SpectralTrainer, set_seed
@@ -9,28 +9,28 @@ from utils.logger import log_training, log_info, log_info_console
 # - save model option in config instead of at runtime
 
 def main():
-    config = load_config()
-    training_seed = config["randomizer_seed"]
+    train_config = Config.from_file()
+    training_seed = train_config.randomizer_seed
     set_seed(training_seed)
 
     log_info_console("Loading and preprocessing data...")
     all_data, all_labels = process_spectral_data(
-        root_folder=config["root_folder"],
-        reduce_dimensions=config["reduce_dimensions"],
-        gaussian_smoothing=config["gaussian_smoothing"],
-        wavelength_range=config["wavelength_range"]
+        root_folder = train_config.root_folder,
+        reduce_dimensions = train_config.reduce_dimensions,
+        gaussian_smoothing = train_config.gaussian_smoothing,
+        wavelength_range = train_config.wavelength_range
     )
 
     feature_dim = all_data.shape[1]
 
     X_train, X_val, X_test, y_train, y_val, y_test, num_classes = prepare_dataset(
-        all_data, all_labels, feature_dim, config
+        all_data, all_labels, feature_dim, train_config
     )
 
     log_info_console("Initializing model and trainer...")
     model = SpectralCNN(feature_dim=feature_dim, num_classes=num_classes)
     model.build(input_shape=(None, 1, feature_dim, 1))
-    trainer = SpectralTrainer(model, config)
+    trainer = SpectralTrainer(model, train_config)
     trainer.compile_model()
 
     log_training("Starting training...")

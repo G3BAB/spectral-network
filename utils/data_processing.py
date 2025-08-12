@@ -104,12 +104,12 @@ def prepare_dataset(all_data, all_labels, feature_dim, config):
     from sklearn.model_selection import train_test_split
     X_train, X_temp, y_train, y_temp = train_test_split(
         all_data, all_labels,
-        test_size=config["test_ratio"] + config["val_ratio"],
+        test_size=config.test_ratio + config.val_ratio,
         stratify=all_labels
     )
     X_val, X_test, y_val, y_test = train_test_split(
         X_temp, y_temp,
-        test_size=config["test_ratio"] / (config["test_ratio"] + config["val_ratio"]),
+        test_size=config.test_ratio / (config.test_ratio + config.val_ratio),
         stratify=y_temp
     )
 
