@@ -42,7 +42,7 @@ class SpectralTrainer:
             metrics=['accuracy']
         )
 
-    def train(self, X_train, y_train, X_val, y_val, all_data_shape, X_test_shape):
+    def train(self, X_train, y_train, X_val, y_val, all_data_shape, X_test_shape, status_callback=None):
         early_stopping = tf.keras.callbacks.EarlyStopping(
             monitor='val_loss',
             patience=self.config.validation_patience,
@@ -65,15 +65,27 @@ class SpectralTrainer:
             )
         )
 
+        # NEW: Wrap user callback in Keras Callback
+        class StatusCallback(tf.keras.callbacks.Callback):
+            def on_epoch_end(self, epoch, logs=None):
+                if status_callback:
+                    loss = logs.get("loss") if logs else None
+                    val_loss = logs.get("val_loss") if logs else None
+                    status_callback(epoch, loss, val_loss)
+
+
+        callbacks = [early_stopping, lr_scheduler, print_logs, StatusCallback()]
+
         history = self.model.fit(
             X_train, y_train,
             validation_data=(X_val, y_val),
             epochs=self.config.epochs,
             batch_size=self.config.batch_size,
-            callbacks=[early_stopping, lr_scheduler, print_logs],
+            callbacks=callbacks,
             verbose=0
         )
         return history
+
 
     def evaluate(self, X_test, y_test):
         test_loss, test_accuracy = self.model.evaluate(X_test, y_test, verbose=0)
@@ -95,6 +107,7 @@ class SpectralTrainer:
         plt.legend()
         plt.tight_layout()
         plt.show()
+        return confusion_mtx  # <-- return confusion matrix
 
     def maybe_save(self):
         save_model = input("\nWould you like to save the trained model? (y/n): ").strip().lower()
@@ -106,11 +119,13 @@ class SpectralTrainer:
             log_info("Model was not saved.")
 
     def finalize(self, history, X_test, y_test):
-        self.evaluate(X_test, y_test)
+        test_acc = self.evaluate(X_test, y_test)
         print(self.config.evaluation_graphics)
+        confusion_mtx = None
         if self.config.evaluation_graphics==True:
-            self.plot_results(history, X_test, y_test)
+            confusion_mtx = self.plot_results(history, X_test, y_test)
         self.maybe_save()
+        return test_acc, confusion_mtx  # <-- return both
 
 
 def set_seed(seed=1):

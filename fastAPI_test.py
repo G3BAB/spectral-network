@@ -11,7 +11,8 @@ training_status = {
     "running": False,
     "epoch": 0,
     "loss": None,
-    "val_loss": None
+    "val_loss": None,
+    "total_epochs": 0
 }
 
 # CHANGED: main() → run_training(config) SO IT CAN BE CALLED FROM FASTAPI
@@ -21,6 +22,7 @@ def run_training(config: Config):
     training_status["epoch"] = 0
     training_status["loss"] = None
     training_status["val_loss"] = None
+    training_status["total_epochs"] = config.epochs
 
     set_seed(config.randomizer_seed)
 
@@ -44,22 +46,25 @@ def run_training(config: Config):
     trainer = SpectralTrainer(model, config)
 
     # NEW: PASS CALLBACK OR STATUS UPDATER INTO TRAINER FOR LIVE STATUS
-    def update_status(epoch, loss, val_loss):
-        training_status["epoch"] = epoch
-        training_status["loss"] = float(loss)
-        training_status["val_loss"] = float(val_loss)
+    def update_status(epoch: int, loss: float | None, val_loss: float | None):
+        training_status["epoch"] = int(epoch)
+        training_status["loss"] = float(loss) if loss is not None else None
+        training_status["val_loss"] = float(val_loss) if val_loss is not None else None
+
 
     trainer.compile_model()
 
     log_training("Starting training...")
     log_training(f"Randomizer seed: {config.randomizer_seed}")
 
+
+    
     # CHANGED: TRAINING FUNCTION RECEIVES UPDATE_STATUS SO PROGRESS IS TRACKED
     history = trainer.train(
         X_train, y_train, X_val, y_val,
         all_data_shape=all_data.shape,
         X_test_shape=X_test.shape,
-        status_callback=update_status  # YOU’LL ADD THIS ARG TO trainer.train()
+        status_callback=update_status
     )
 
     log_training("Evaluating model...")

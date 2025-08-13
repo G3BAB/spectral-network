@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Mineral Recognition Trainer</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="stylesheet" href="/static/styles.css"/>
+</head>
+<body>
+  <div class="container">
+    <div class="left">
+      <h2>Configuration</h2>
+
+      <form id="config-form">
+        <div class="grid">
+          <!-- These inputs are populated from /config on load -->
+          <label>epochs <input type="number" step="1" name="epochs"></label>
+          <label>initial_learning_rate <input type="number" step="0.0001" name="initial_learning_rate"></label>
+          <label>learning_rate_scaling <input type="number" step="0.0001" name="learning_rate_scaling"></label>
+          <label>scaling_frequency <input type="number" step="1" name="scaling_frequency"></label>
+          <label>validation_patience <input type="number" step="1" name="validation_patience"></label>
+          <label>batch_size <input type="number" step="1" name="batch_size"></label>
+          <label>test_ratio <input type="number" step="0.01" name="test_ratio"></label>
+          <label>val_ratio <input type="number" step="0.01" name="val_ratio"></label>
+          <label>root_folder <input type="text" name="root_folder"></label>
+          <label>model_save_path <input type="text" name="model_save_path"></label>
+          <label>reduce_dimensions 
+            <select name="reduce_dimensions">
+              <option value="true">true</option><option value="false">false</option>
+            </select>
+          </label>
+          <label>gaussian_smoothing 
+            <select name="gaussian_smoothing">
+              <option value="true">true</option><option value="false">false</option>
+            </select>
+          </label>
+          <label>wavelength_range (e.g. 0,1500)
+            <input type="text" name="wavelength_range" placeholder="0,1500">
+          </label>
+          <label>evaluation_graphics 
+            <select name="evaluation_graphics">
+              <option value="true">true</option><option value="false">false</option>
+            </select>
+          </label>
+          <label>randomizer_seed <input type="number" step="1" name="randomizer_seed"></label>
+        </div>
+
+        <div class="row">
+          <button type="submit">Save Config</button>
+          <button type="button" id="btn-refresh">Reload</button>
+        </div>
+      </form>
+
+      <hr>
+
+      <h3>Load / Save Config File</h3>
+      <div class="row">
+        <input type="file" id="file-input" accept=".txt"/>
+        <button type="button" id="btn-upload">Load from File</button>
+        <button type="button" id="btn-download">Download Current Config</button>
+      </div>
+
+      <hr>
+
+      <h3>Training</h3>
+      <div class="row">
+        <button type="button" id="btn-train">Start Training</button>
+        <span id="train-status" class="status">Idle</span>
+      </div>
+      <div id="epoch-info"></div>
+    </div>
+
+    <div class="right">
+      <h2>Loss (Live)</h2>
+      <div id="chart-placeholder">[ chart placeholder ]</div>
+
+      <div id="training-progress-container" style="margin-top: 15px;">
+        <label for="training-progress">Training Progress:</label>
+        <progress id="training-progress" value="0" max="100" style="width:100%; height:20px; display:block; margin-top:5px;"></progress>
+        <span id="progress-text" style="display:block; text-align:right; font-size:0.9em;">0%</span>
+      </div>
+
+      <h2>Results</h2>
+      <div id="results">
+        <div>Accuracy: <span id="accuracy">—</span></div>
+        <div id="cm-container">
+          <h4>Confusion Matrix</h4>
+          <div id="cm-table-wrapper"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>

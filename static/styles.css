@@ -1,0 +1,118 @@
+:root {
+  --bg: #0b0f14;
+  --panel: #121821;
+  --text: #e5e7eb;
+  --muted: #9aa4b2;
+  --accent: #59b4ff;
+  --border: #1f2937;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  line-height: 1.4;
+}
+h2, h3, h4 { margin: 12px 0; }
+.container {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 16px;
+  padding: 16px;
+}
+.left, .right {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+label {
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--muted);
+}
+input[type="text"], input[type="number"], select {
+  background: #0f1520;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  color: var(--text);
+}
+button {
+  background: var(--accent);
+  color: #06121f;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+button:hover { filter: brightness(1.1); }
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+}
+.status {
+  color: var(--muted);
+  font-size: 14px;
+}
+#chart-placeholder {
+  height: 300px;
+  background: #0f1520;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+#training-progress-container {
+  margin-top: 15px;
+  background-color: #f5f5f5;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+#training-progress {
+  width: 100%;
+  height: 20px;
+  border-radius: 4px;
+  background-color: #ddd;
+}
+
+#training-progress::-webkit-progress-bar {
+  background-color: #eee;
+  border-radius: 4px;
+}
+
+#training-progress::-webkit-progress-value {
+  background-color: #4caf50; /* green fill */
+  border-radius: 4px;
+}
+
+#progress-text {
+  font-size: 0.85em;
+  color: #333;
+  text-align: right;
+  margin-top: 3px;
+}
+
+#cm-table-wrapper table {
+  border-collapse: collapse;
+}
+#cm-table-wrapper td, #cm-table-wrapper th {
+  border: 1px solid var(--border);
+  padding: 4px 6px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}

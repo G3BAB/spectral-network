@@ -79,7 +79,8 @@ class Config:
         
         # Special case for wavelength_range tuple
         if key == "wavelength_range" and "," in value:
-            return tuple(map(int, value.strip("()").split(",")))
+            cleaned = value.strip("()[]{} \n")
+            return tuple(map(int, cleaned.split(",")))
         
         if "." in value:
             try:
