@@ -8,6 +8,8 @@ This project is designed for the classification of mineral spectra using a Convo
 - The config file can be modified to customize the training process. Values present there by default are the ones that gave me the best results for my data.
 - The config file will be automatically restored in the event of its deletion, or if it's modified beyond the capabilities of the config handler script.
 
+- **GUI APP** is available in fastapi_test branch - it doesn't function perfectly so far. Collaboration on the app is welcome.
+
 ## Future development
 As of now, the code trains and evaluates the accuracy of the network. However, a functionality that allows the user to then upload independent data for classification has not yet been implemented. It will be the focus of development in the near future.
 
